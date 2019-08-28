@@ -25,7 +25,7 @@ Perl Modules: Time::Piece (core with modern Perl) <br/>
 [snippy>=4.1.0](https://github.com/tseemann/snippy)<br/>
 [vt>=0.5](https://genome.sph.umich.edu/wiki/Vt)<br/>
 [samtools>=1.9](http://www.htslib.org/doc/samtools.html)<br/>
-[seqkit](https://bioinf.shenwei.me/seqkit/)<br/>
+[seqkit>=0.7](https://bioinf.shenwei.me/seqkit/)<br/>
 
 ## Setting up the config.yaml file
 
