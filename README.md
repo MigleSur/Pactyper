@@ -55,7 +55,13 @@ SNP_distance: 5000
 
 ## Input files and input requirements
 
+No files should be deleted from the output directory or the code will fail during the next run. 
+
 ## Running the pipeline
+
+## Rerunning the pipeline
+
+Pipeline can be rerun when new samples are added by changing the sample name in the config.yaml file. 
 
 ## Author
 
