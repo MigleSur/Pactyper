@@ -59,6 +59,8 @@ No files should be deleted from the output directory or the code will fail durin
 
 ## Running the pipeline
 
+Include is authomatically defined as "Yes" if the input sample is the very first sample added.
+
 ## Rerunning the pipeline
 
 Pipeline can be rerun when new samples are added by changing the sample name in the config.yaml file. 
