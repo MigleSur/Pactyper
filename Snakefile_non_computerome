@@ -297,16 +297,23 @@ rule estimate_clonetype:
 
 		close_clonetypes=`cat {input.snp_dist} | tail -1  | cut -f 2- | datamash transpose | head -n -1 | nl | awk '$2<{params.distance} {{print $1}}'`
 
-		while read line
-		do
-			new_num=`echo "$line" +1 | bc`
-			cat {input.initial_distance} | head -1 | cut -f "$new_num"
-		done <<< "$close_clonetypes" >> {output.temp_clonetype_list}
-		
-		clonetype_number=`cat {output.temp_clonetype_list} | sort | uniq -c | sort -k1,1n`
+		if [[ ! -z "$close_clonetypes" ]]
+		then
+			while read line
+			do
+				new_num=`echo "$line" +1 | bc`
+				cat {input.initial_distance} | head -1 | cut -f "$new_num"
+			done <<< "$close_clonetypes" >> {output.temp_clonetype_list}
+
+			clonetype_number=`cat {output.temp_clonetype_list} | sort | uniq -c | sort -k1,1n`
 	
-		line_number=`echo "$clonetype_number" | wc -l`
-		
+			line_number=`echo "$clonetype_number" | wc -l`
+	
+		else
+			touch {output.temp_clonetype_list}
+			line_number=0
+		fi
+	
 		# if only one clone type is predicted:	
 		if [[ "$line_number" == 1  ]]
 		then
@@ -333,6 +340,7 @@ You might want to reconsider SNP distance threshold. If the sample is set to be 
 		then
 			echo "No already existing clone types are closer than the {params.distance} SNP distance threshold.
 New clone type assigned: {params.new_clonetype}" > {output.stats}
+			clonetype={params.prefix}{params.new_clonetype}
 		fi
 
 		# if include is true change the name of complete snp distance and sorted alignment files to the name of the assigned clone type
