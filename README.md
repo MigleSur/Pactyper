@@ -70,7 +70,7 @@ SNP_distance: 5000
 
 The code is written to (1) build and (2) apply and extend the clone type matrix over time.
 
-1. The first input sample will be assigned the `[prefix]001` clone type
+1. The first input sample will be assigned the `[prefix]001` clone type. Include is automatically defined as "True" for the first input sample.
 2. The second all other input samples will be compared to the existing samples and if the SNP distance is lower than defined in the configuration file, the existing clone type which passes the criteria is assigned. If none of the clone types are close enough to the input file, the new clone type is assigned to the input sample.
 3. If it is stated in the configuration file that the input sample should be included in the final martix, the predicted clone type will be assigned to the input sample and it will be added to the final distance matrix.
 
@@ -79,8 +79,6 @@ The code is written to (1) build and (2) apply and extend the clone type matrix 
 No files should be deleted from the output_files directory or the code will fail during the next run. 
 
 ## Running the pipeline
-
-Include is authomatically defined as "Yes" if the input sample is the very first sample added.
 
 ## Rerunning the pipeline
 
