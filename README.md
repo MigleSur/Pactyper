@@ -41,6 +41,7 @@ Perl Modules: Time::Piece (core with modern Perl) <br/>
 [samtools>=1.9](http://www.htslib.org/doc/samtools.html)<br/>
 [seqkit>=0.7](https://bioinf.shenwei.me/seqkit/)<br/>
 [snp-dists>=0.6.3](https://github.com/tseemann/snp-dists)
+[datamash>=1.4](https://www.gnu.org/software/datamash/)
 
 ## Setting up the config.yaml file
 
