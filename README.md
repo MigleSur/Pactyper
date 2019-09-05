@@ -40,6 +40,7 @@ Perl Modules: Time::Piece (core with modern Perl) <br/>
 [vt>=0.5](https://genome.sph.umich.edu/wiki/Vt)<br/>
 [samtools>=1.9](http://www.htslib.org/doc/samtools.html)<br/>
 [seqkit>=0.7](https://bioinf.shenwei.me/seqkit/)<br/>
+[snp-dists>=0.6.3](https://github.com/tseemann/snp-dists)
 
 ## Setting up the config.yaml file
 
