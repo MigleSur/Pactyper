@@ -1,7 +1,18 @@
 # Pactyper
-Snakemake pipeline for continiuos clone type prediction for WGS sequenced bacterial isolates based on their core genome.
+Snakemake pipeline for continious clone type prediction for WGS sequenced bacterial isolates based on their core genome.
 
 ## General information
+
+All the code is in the Snakefile and is written in snakemake.
+
+The pipeline takes a fastq file of genome of interest and a core genome fasta file as input and outputs:
+1. Alignment quality statistics for the input sample: `[output_dir]/sample_alignments/alignment_statistics.txt`
+2. Aligned fasta file with SNPs applied to the core genome sequence: `[output_dir]/sample_alignments/[sample_name].aligned.fa`
+3. VCF file will all the called variants in the core genome: `[output_dir]/sample_alignments/[sample_name].vcf.gz`
+4. Clone type preditcion for the input sample: `[output_dir]/sample_alignments/[sample_name]_clonetype_summary.txt`
+5. SNP distance matrix which includes all the samples already present in the matrix: `[output_dir]/sample_alignments/[sample_name]_clonetype_snp_distances.txt`
+6. SNP distance matrix visualization (IN PROGRESS, not implemented yet)
+
 
 ## Required software
 
