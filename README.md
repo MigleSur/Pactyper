@@ -78,6 +78,8 @@ The code is written to (1) build and (2) apply and extend the clone type matrix 
 
 No files should be deleted from the output_files directory or the code will fail during the next run. 
 
+[Snippy4](https://github.com/tseemann/snippy) doesn't work with python3. Python3 should be disabled at that step and Python2 should be available. 
+
 ## Running the pipeline
 
 In order to run the pipeline anaconda3 (version 4.0.0) has to be available. Snakemake is started from its directory:
