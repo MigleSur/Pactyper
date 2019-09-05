@@ -45,7 +45,7 @@ In order for the pipeline to run, a configuration file is needed. A configuratio
 Field name | Description
 ------------ | ------------
 input_dir | Directory in which all fastq files which will be analyzed are present
-input_sample | The name of the sample for which the clone type has to be predicted
+input_sample | The unique prefix of the sample for which the clone type has to be predicted
 core_genome | Full path to the FASTA file containing all the core genome genes
 output_dir | Directory where all the output files will be stored
 include | If the input sample should be included to the final matrix with the predicted clone type and used in the future iterations
@@ -80,9 +80,25 @@ No files should be deleted from the output_files directory or the code will fail
 
 ## Running the pipeline
 
+In order to run the pipeline anaconda3 (version 4.0.0) has to be available. Snakemake is started from its directory:
+
+```
+-j option allows to choose the number of threads (1-28) used for the analysis (default:1)
+--configfile option allows to chose the configuration file for the analysis
+--config option allows to overwrite the config file
+```
+
+Here is the example code for running snakemake:
+
+```
+snakemake -j 10 --configfile config.yaml --config input_sample="test_sample"
+
+```
+
+
 ## Rerunning the pipeline
 
-Pipeline can be rerun when new samples are added by changing the sample name in the config.yaml file. 
+Pipeline can be rerun when new samples are added by changing the sample name in the config.yaml file or by overwritting the config file in the command line.
 
 ## Author
 
