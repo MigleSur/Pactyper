@@ -6,6 +6,7 @@ Snakemake pipeline for continious clone type prediction for WGS sequenced bacter
 All the code is in the Snakefile and is written in snakemake.
 
 The pipeline takes (1) a fastq file of genome of interest and (2) a core genome fasta file as input and outputs:
+
 Output file description | Output file location
 ------------ | ------------
 Alignment quality statistics for the input sample | `[output_dir]/sample_alignments/alignment_statistics.txt`
