@@ -36,10 +36,23 @@ READS={}
 READS['R1'] = glob.glob(input_dir+'/'+input_sample+"*R1*")[0]
 READS['R2'] = glob.glob(input_dir+'/'+input_sample+"*R2*")[0]
 
+# check if the file is already present in the matrix. Authomatically set include to False if the file is already in the matrix.
+def check_if_exists_in_matrix():
+	myfile_dist=Path(output_dir+'/output_files/complete_clonetype_distance_matrix.txt')
+        if myfile_dist.is_file():
+		with open(output_dir+'/output_files/complete_clonetype_distance_matrix.txt') as f:
+			names = [line.split('\t')[0] for line in f][1:]
+		trimmed_names = [name.split('::')[1] for name in names]
+		if input_sample in trimmed_names:
+			if include_to_final is True:
+				config['include']=False
+				eprint("The file already exists in the matrix. Parameter \"Include\" is set to False")
+
+check_if_exists_in_matrix()
 
 def number_of_existing_samples():
-	myfile=Path(output_dir+'/output_files/complete_clonetype_sorted_alignment.fa')
-	if myfile.is_file():
+	myfile_aln=Path(output_dir+'/output_files/complete_clonetype_sorted_alignment.fa')
+	if myfile_aln.is_file():
 		sample_no=int(sum(1 for line in open(output_dir+'/output_files/complete_clonetype_sorted_alignment.fa') if line.rstrip())/2)
 	else:
 		sample_no=0
@@ -55,12 +68,14 @@ def follows_the_pattern(name):
 		return False
 
 def new_clonetype():
-	myfile=Path(output_dir+'/output_files/complete_clonetype_distance_matrix.txt')
-	if myfile.is_file():
+	myfile_dist=Path(output_dir+'/output_files/complete_clonetype_distance_matrix.txt')
+	if myfile_dist.is_file():
 		with open(output_dir+'/output_files/complete_clonetype_distance_matrix.txt') as f:
-			num = [line.split('\t')[0][2:] for line in f]
-		
+			names = [line.split('\t')[0] for line in f]
+		num = [name.split('::')[0][-3:] for name in names]
 		numbers=int(max(filter(follows_the_pattern, num)))+1
+	elif sample_no==1:
+		numbers=2
 	else:
 		numbers=1
 	return("{:03d}".format(numbers))
@@ -78,7 +93,7 @@ rule all:
 		aligned=expand("{output_dir}/sample_alignments/{sample}/{sample}.aligned.fa", sample=config['input_sample'], output_dir=config['output_dir']),
 		stats=expand("{output_dir}/sample_alignments/{sample}/alignment_statistics.txt", sample=config['input_sample'], output_dir=config['output_dir']),
 		snp_dist=expand("{output_dir}/sample_alignments/{sample}/{sample}_clonetype_snp_distances.txt", output_dir=config['output_dir'], sample=config['input_sample']) if sample_no>=1 else [],
-		initial_alignment=expand("{output_dir}/output_files/complete_clonetype_sorted_alignment.fa", output_dir=config['output_dir']) if sample_no==1 else [],
+		initial_alignment=expand("{output_dir}/output_files/complete_clonetype_sorted_alignment.fa", output_dir=config['output_dir']) if sample_no==0 else [],
 		clonetype_stats=expand("{output_dir}/sample_alignments/{sample}/{sample}_clonetype_summary.txt", output_dir=config['output_dir'], sample=config['input_sample']) if sample_no>=1 else []
 	message:
 		"Pipeline complete"
@@ -184,7 +199,8 @@ if sample_no >= 2:
 	rule snp_dists:
 		input:
 			aligned_file=expand("{output_dir}/sample_alignments/{sample}/{sample}.aligned.fa", sample=config['input_sample'], output_dir=config['output_dir']),
-			initial_alignment=expand("{output_dir}/output_files/complete_clonetype_sorted_alignment.fa", output_dir=config['output_dir']) 
+			initial_alignment=expand("{output_dir}/output_files/complete_clonetype_sorted_alignment.fa", output_dir=config['output_dir']),
+			alignment_statistics=expand("{output_dir}/sample_alignments/{sample}/alignment_statistics.txt", sample=config['input_sample'], output_dir=config['output_dir'])
 		output:
 			consensus_sample=temp(expand("{output_dir}/sample_alignments/{sample}/{sample}.consensus.fa", sample=config['input_sample'], output_dir=config['output_dir'])),
 			snp_dist=expand("{output_dir}/sample_alignments/{sample}/{sample}_clonetype_snp_distances.txt", output_dir=config['output_dir'], sample=config['input_sample']),
@@ -244,13 +260,14 @@ if sample_no == 1:
 	rule snp_dists:
 		input:
 			aligned_file=expand("{output_dir}/sample_alignments/{sample}/{sample}.aligned.fa", sample=config['input_sample'], output_dir=config['output_dir']),
-			initial_alignment=expand("{output_dir}/output_files/complete_clonetype_sorted_alignment.fa", output_dir=config['output_dir'])
+			initial_alignment=expand("{output_dir}/output_files/complete_clonetype_sorted_alignment.fa", output_dir=config['output_dir']),
+			alignment_statistics=expand("{output_dir}/sample_alignments/{sample}/alignment_statistics.txt", sample=config['input_sample'], output_dir=config['output_dir'])
 		output:
 			consensus_sample=temp(expand("{output_dir}/sample_alignments/{sample}/{sample}.consensus.fa", sample=config['input_sample'], output_dir=config['output_dir'])),
 			snp_dist=expand("{output_dir}/sample_alignments/{sample}/{sample}_clonetype_snp_distances.txt", output_dir=config['output_dir'], sample=config['input_sample']),
 			temp_fasta=temp(expand("{output_dir}/sample_alignments/{sample}/temp_fasta.fa", output_dir=config['output_dir'], sample=config['input_sample'])),
+			initial_distance=expand("{output_dir}/output_files/complete_clonetype_distance_matrix.txt", output_dir=config['output_dir'])
 		params:
-			initial_distance=expand("{output_dir}/output_files/complete_clonetype_distance_matrix.txt", output_dir=config['output_dir']) if include_to_final==True else [],
 			temp_consensus=temp(expand("{output_dir}/output_files/temp_complete_clonetype_sorted_alignment.fa", output_dir=config['output_dir'])),
 			sample=config['input_sample'],
 			incl=config['include']
@@ -271,14 +288,13 @@ if sample_no == 1:
 			snp-dists -q -b {output.temp_fasta} > {output.snp_dist}
 		
 
-			# if include is true output snps distance file and initial alignment file should be updated with the new file. Filename should be changed in the next rule.
-			if [[ {params.incl} == "True" ]]
-			then
-				cat {input.initial_alignment} {output.consensus_sample} > {params.temp_consensus}
-				mv {params.temp_consensus} {input.initial_alignment}
+			# output snps distance file and initial alignment file should be updated with the new file. Filename should be changed in the next rule.
+			
+			cat {input.initial_alignment} {output.consensus_sample} > {params.temp_consensus}
+			mv {params.temp_consensus} {input.initial_alignment}
 
-				cp {output.snp_dist} {params.initial_distance}
-			fi
+			cp {output.snp_dist} {output.initial_distance}
+			
 			"""
 
 
@@ -289,7 +305,8 @@ rule create_complete_aligment:
 	output:
 		initial_alignment=expand("{output_dir}/output_files/complete_clonetype_sorted_alignment.fa", output_dir=config['output_dir']) if sample_no<1 else []
 	params:
-		prefix=config['prefix']
+		prefix=config['prefix'],
+		sample=config['input_sample']
 	message:
 		"Adding the sample to the multiple sequence FASTA file"
 	shell:
@@ -299,7 +316,7 @@ rule create_complete_aligment:
 
 		# creating a sorted fasta file with all the genes merged in one sequence
 
-		seqkit sort --id-regexp "(.+)" {input.aligned_file} |  grep -v "^>" | awk \'!/^>/ {{ printf "%s", $0; n = "\\n" }} /^>/ {{ print n $0; n = "" }} END {{ printf "%s", n }}\' |  sed "1s/^/>{params.prefix}001\\n/" > {output.initial_alignment}
+		seqkit sort --id-regexp "(.+)" {input.aligned_file} |  grep -v "^>" | awk \'!/^>/ {{ printf "%s", $0; n = "\\n" }} /^>/ {{ print n $0; n = "" }} END {{ printf "%s", n }}\' |  sed "1s/^/>{params.prefix}001::{params.sample}\\n/" > {output.initial_alignment}
 		"""
 
 
@@ -331,7 +348,7 @@ rule estimate_clonetype:
 			while read line
 			do
 				new_num=`echo "$line" +1 | bc`
-				cat {input.initial_distance} | head -1 | cut -f "$new_num"
+				cat {input.initial_distance} | head -1 | cut -f "$new_num"| sed 's/::.*//'
 			done <<< "$close_clonetypes" >> {output.temp_clonetype_list}
 
 			clonetype_number=`cat {output.temp_clonetype_list} | sort | uniq -c | sort -k1,1n`
@@ -361,7 +378,7 @@ You might want to reconsider SNP distance threshold. If the sample is set to be 
 				number=`echo "$clonetype_line" | awk '{{print $1}}'`
 				clonetype=`echo "$clonetype_line" | awk '{{print $2}}'`
 				total_number=`cat {input.snp_dist} | cut -f 1 | grep -w "$clonetype" | wc -l`
-				echo "Clonetype "$total_number" in "$number" out of "$total_number" samples with this clonetype which fall below the SNP distance threshold." >> {output.stats}
+				echo "Clonetype "$clonetype" in "$number" out of "$total_number" samples with this clonetype which fall below the SNP distance threshold." >> {output.stats}
 		
 			done <<< "$clonetype_number"
 	
@@ -375,8 +392,8 @@ New clone type assigned: {params.new_clonetype}" > {output.stats}
 		# if include is true change the name of complete snp distance and sorted alignment files to the name of the assigned clone type
 		if [[ {params.incl} == "True" ]]
 		then
-			sed -i "s/^>{params.sample}/>\"$clonetype\"/" {input.initial_alignment}
-			sed -i "s/{params.sample}/\"$clonetype\"/" {input.initial_distance}
+			sed -i "s/^>{params.sample}/>\"$clonetype\"::{params.sample}/" {input.initial_alignment}
+			sed -i "s/{params.sample}/\"$clonetype\"::{params.sample}/" {input.initial_distance}
 		fi
 		"""
 
