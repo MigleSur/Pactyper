@@ -157,11 +157,8 @@ rule run_snippy:
 		module load bcftools/1.9
 		module load snippy/4.4.0
 		module load vt/0.5772
-
-
 		(snippy --outdir {params.outdir}/sample_alignments/{params.prefix} --ref {params.ref} --R1 {input.R1} --R2 {input.R2} --prefix {params.prefix} --cpus {params.cpus}  --force --mincov {params.mincov}) 2> {log}
 		# how to add to a previous SNP distance? cp - if include is No, add if include is Yes?
-
 		"""
 
 def do_QC(fasta_file, output_file):
@@ -218,11 +215,9 @@ if sample_no >= 2:
 			"""
 			module load pigz/2.3.4
 			module load seqkit/0.7.1	
-
 			# creating a sorted fasta file with all the genes merged in one sequence
 	
 			seqkit sort --id-regexp "(.+)" {input.aligned_file} | grep -v "^>" | awk \'!/^>/ {{ printf "%s", $0; n = "\\n" }} /^>/ {{ print n $0; n = "" }} END {{ printf "%s", n }}\' |  sed "1s/^/>{params.sample}\\n/" > {output.consensus_sample}
-
 			# performing snp-dist for each sample pair (new sample vs every older sample)
 		
 			cat {input.initial_alignment} | nl | grep ">" > {output.temp_names}	
@@ -277,22 +272,16 @@ if sample_no == 1:
 			"""
 			module load pigz/2.3.4
 			module load seqkit/0.7.1
-
 			# creating a sorted fasta file with all the genes merged in one sequence
-
 			seqkit sort --id-regexp "(.+)" {input.aligned_file} | grep -v "^>" | awk \'!/^>/ {{ printf "%s", $0; n = "\\n" }} /^>/ {{ print n $0; n = "" }} END {{ printf "%s", n }}\' |  sed "1s/^/>{params.sample}\\n/" > {output.consensus_sample}
-
 			# performing snp-dists for the only two samples which are available
-
 			cat {input.initial_alignment} {output.consensus_sample} > {output.temp_fasta}
 			snp-dists -q -b {output.temp_fasta} > {output.snp_dist}
 		
-
 			# output snps distance file and initial alignment file should be updated with the new file. Filename should be changed in the next rule.
 			
 			cat {input.initial_alignment} {output.consensus_sample} > {params.temp_consensus}
 			mv {params.temp_consensus} {input.initial_alignment}
-
 			cp {output.snp_dist} {output.initial_distance}
 			
 			"""
@@ -313,9 +302,7 @@ rule create_complete_aligment:
 		"""
 		module load pigz/2.3.4
 		module load seqkit/0.7.1
-
 		# creating a sorted fasta file with all the genes merged in one sequence
-
 		seqkit sort --id-regexp "(.+)" {input.aligned_file} |  grep -v "^>" | awk \'!/^>/ {{ printf "%s", $0; n = "\\n" }} /^>/ {{ print n $0; n = "" }} END {{ printf "%s", n }}\' |  sed "1s/^/>{params.prefix}001::{params.sample}\\n/" > {output.initial_alignment}
 		"""
 
@@ -340,17 +327,15 @@ rule estimate_clonetype:
 	shell:
 		"""
 		module load datamash/1.4
-
 		close_clonetypes=`cat {input.snp_dist} | tail -1  | cut -f 2- | datamash transpose | head -n -1 | nl | awk '$2<{params.distance} {{print $1}}'`
-
 		if [[ ! -z "$close_clonetypes" ]]
 		then
 			while read line
 			do
 				new_num=`echo "$line" +1 | bc`
-				cat {input.initial_distance} | head -1 | cut -f "$new_num"| sed 's/::.*//'
+				head -1 {input.initial_distance} | cut -f "$new_num"  | sed 's/::.*//'
 			done <<< "$close_clonetypes" >> {output.temp_clonetype_list}
-
+			
 			clonetype_number=`cat {output.temp_clonetype_list} | sort | uniq -c | sort -k1,1n`
 	
 			line_number=`echo "$clonetype_number" | wc -l`
@@ -388,7 +373,6 @@ You might want to reconsider SNP distance threshold. If the sample is set to be 
 New clone type assigned: {params.new_clonetype}" > {output.stats}
 			clonetype={params.prefix}{params.new_clonetype}
 		fi
-
 		# if include is true change the name of complete snp distance and sorted alignment files to the name of the assigned clone type
 		if [[ {params.incl} == "True" ]]
 		then

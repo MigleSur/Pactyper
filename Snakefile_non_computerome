@@ -262,7 +262,7 @@ rule estimate_clonetype:
 			while read line
 			do
 				new_num=`echo "$line" +1 | bc`
-				cat {input.initial_distance} | head -1 | cut -f "$new_num"| sed 's/::.*//'
+				head -1 {input.initial_distance} | cut -f "$new_num"| sed 's/::.*//'
 			done <<< "$close_clonetypes" >> {output.temp_clonetype_list}
 
 			clonetype_number=`cat {output.temp_clonetype_list} | sort | uniq -c | sort -k1,1n`
