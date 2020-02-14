@@ -107,6 +107,12 @@ snakemake -j 10 --configfile config.yaml --config input_sample="test_sample"
 
 Pipeline can be rerun when new samples are added by changing the sample name in the config.yaml file or by overwritting the config file in the command line.
 
+## Citation
+
+Migle Gabrielaite, Rasmus L. Marvig <br/>
+Pactyper: Snakemake pipeline for continious clone type prediction for WGS sequenced bacterial isolates based on their core genome. <br/>
+doi: [10.5281/zenodo.3667690](https://doi.org/10.5281/zenodo.3667690)
+
 ## Author
 
 Migle Gabrielaite | migle.gabrielaite@regionh.dk
