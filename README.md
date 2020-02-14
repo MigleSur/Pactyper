@@ -1,5 +1,5 @@
 # Pactyper
-Snakemake pipeline for continious clone type prediction for WGS sequenced bacterial isolates based on their core genome.
+Snakemake pipeline for continuous clone type prediction for WGS sequenced bacterial isolates based on their core genome.
 
 ## General information
 
