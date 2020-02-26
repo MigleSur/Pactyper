@@ -161,7 +161,7 @@ rule run_snippy:
 		# how to add to a previous SNP distance? cp - if include is No, add if include is Yes?
 		"""
 
-def do_QC(fasta_file, output_file):
+def do_QC(fasta_file, output_file, log_file):
 	with open(fasta_file, "r") as f:
 		sequence = "".join(line.strip() for line in f if line[:1]!=">")
 		seq_len = len(sequence)
@@ -170,26 +170,32 @@ def do_QC(fasta_file, output_file):
 		missing_percent = (missing_len*100)/seq_len
 		present_percent = 100 - missing_percent
 	f.closed
-	if missing_percent >5:
-		raise Exception("ERROR: The sequence alignment is less than 95% of the reference sequence. Analysis can't be continued because of low coverage.")
+	if missing_percent >20:
+		with open(log_file, "w") as logf:
+			logf.write("Core genome consists of {total} positions.\n\
+In total {considered} positions were covered by not less than 10 reads.\n\
+{covered}% of positions were covered by not less than 10 reads.\n".format(total=seq_len, considered=cons_positions, covered=round(present_percent, 2)))
+		raise Exception("ERROR: The sequence alignment is less than 80% of the reference sequence. Analysis can't be continued because of low coverage.")
 	else:
-		print("Sequence alignment covers 95% or more of the reference sequence")
+		print("Sequence alignment covers 80% or more of the reference sequence")
 		with open(output_file, "w") as outf:
-			outf.write("Core genome consists of\t{total} positions.\n\
+			outf.write("Core genome consists of {total} positions.\n\
 In total {considered} positions were covered by not less than 10 reads.\n\
 {covered}% of postions were covered by not less than 10 reads.\n".format(total=seq_len, considered=cons_positions, covered=round(present_percent, 2)))
 			
 		
-# Check if the alignment covers >=95% of the reference genome
+# Check if the alignment covers >=80% of the reference core genome
 rule do_QC:
 	input:
 		expand("{output_dir}/sample_alignments/{sample}/{sample}.aligned.fa", sample=config['input_sample'], output_dir=config['output_dir'])
 	output:
 		expand("{output_dir}/sample_alignments/{sample}/alignment_statistics.txt", sample=config['input_sample'], output_dir=config['output_dir'])
+	log:
+		expand("{output_dir}/sample_alignments/{sample}/unsuccessful_alignment_statistics.txt", sample=config['input_sample'], output_dir=config['output_dir'])
 	message:
 		"Performing quality check of the alignment coverage."
 	run:
-		do_QC(input[0], output[0])
+		do_QC(input[0], output[0], log[0])
 
 if sample_no >= 2:
 # SNP distance analysis on the provided samples
