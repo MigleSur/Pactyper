@@ -60,7 +60,7 @@ SNP_distance | Number of SNP difference in the core genome for isolates to be de
 Here is the example config.yaml file:
 
 ```
-input_dir: "/home/project_name/fastqs/"
+input_dir: "/home/project_name/fastqs"
 input_sample: "551_12062011-DK10-0"
 core_genome: "/home/project_name/Pseudomonas_aeruginosa/Pseudomonas_aeruginosa_core_genome.fasta"
 output_dir: "/home/project_name/output_files"
