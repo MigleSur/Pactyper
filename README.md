@@ -1,5 +1,5 @@
 # Pactyper
-Snakemake pipeline for continious clone type prediction for WGS sequenced bacterial isolates based on their core genome.
+Snakemake pipeline for continuous clone type prediction for WGS sequenced bacterial isolates based on their core genome.
 
 ## General information
 
@@ -40,7 +40,7 @@ Perl Modules: Time::Piece (core with modern Perl) <br/>
 [vt>=0.5](https://genome.sph.umich.edu/wiki/Vt)<br/>
 [samtools>=1.9](http://www.htslib.org/doc/samtools.html)<br/>
 [seqkit>=0.7](https://bioinf.shenwei.me/seqkit/)<br/>
-[snp-dists>=0.6.3](https://github.com/tseemann/snp-dists)
+[snp-dists>=0.6.3](https://github.com/tseemann/snp-dists)<br/>
 [datamash>=1.4](https://www.gnu.org/software/datamash/)
 
 ## Setting up the config.yaml file
@@ -106,6 +106,12 @@ snakemake -j 10 --configfile config.yaml --config input_sample="test_sample"
 ## Rerunning the pipeline
 
 Pipeline can be rerun when new samples are added by changing the sample name in the config.yaml file or by overwritting the config file in the command line.
+
+## Citation
+
+Migle Gabrielaite, Rasmus L. Marvig <br/>
+Pactyper: Snakemake pipeline for continious clone type prediction for WGS sequenced bacterial isolates based on their core genome. <br/>
+doi: [10.5281/zenodo.3667690](https://doi.org/10.5281/zenodo.3667690)
 
 ## Author
 
