@@ -3,7 +3,7 @@ Snakemake pipeline for continuous clone type prediction for WGS sequenced bacter
 
 ## General information
 
-All the code is in the Snakefile and is written in snakemake. Snakefile_non_computerome file should be used by users which are not using [Computerome](https://www.computerome.dk/) to run the pipeline.
+All the code is in the Snakefile and is written in snakemake. Snakefile_non_computerome file should be used by users which are not using [Computerome](https://www.computerome.dk/) to run the pipeline (the file should be renamed to 'Snakefile').
 
 The pipeline takes (1) a fastq file of genome of interest and (2) a core genome fasta file as input and outputs:
 
